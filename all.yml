@@ -1,0 +1,116 @@
+---
+- hosts: "master, workers"
+  become_method: sudo
+  become: yes
+  gather_facts: yes
+
+  pre_tasks:
+    - name: Add the overlay and br_netfilter modules
+      modprobe:
+        name: "{{ item }}"
+        state: present
+      loop:
+        - "overlay"
+        - "br_netfilter"
+
+    - name: Set system configurations for Kubernetes networking
+      file:
+        path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+        state: "touch"
+
+    - name: Add conf for containerd
+      blockinfile:
+        path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+        block: |
+               net.bridge.bridge-nf-call-iptables = 1
+               net.ipv4.ip_forward = 1
+               net.bridge.bridge-nf-call-ip6tables = 1
+
+    - name: Install packages that allow apt to be used over HTTPS
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+        - apt-transport-https
+        - ca-certificates
+        - curl
+        - gnupg-agent
+        - software-properties-common
+        - fuse-overlayfs
+
+    - name: add Kubernates apt-key
+      apt_key:
+        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+        state: present
+
+    - name: add Kubernates repository apt repository
+      apt_repository:
+        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+        state: present
+        filename: kubernates
+        update_cache: yes
+
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
+
+    - name: Apply new settings
+      command: sudo sysctl --system
+
+    - name: Disable swap
+      shell:
+        cmd: |
+          swapoff -a
+      args:
+        executable: /bin/bash
+
+    - name: Remove Swap from fstab
+      mount:
+        name: swap
+        fstype: swap
+        state: absent
+
+- hosts: "master"
+  become: yes
+  become_method: sudo
+  roles:
+    - update_debian
+#    - ufw-role
+#    - ansible-role-containerd
+    - ansible-role-cri_o
+#  vars:
+#    containerd_flavor: "k8s"
+#  vars:
+#    containerd_config_cgroup_driver_systemd: true
+
+- hosts: "workers"
+  become: yes
+  become_method: sudo
+  roles:
+    - update_debian
+    - ufw-role
+#    - ansible-role-containerd
+    - ansible-role-cri_o
+#  vars:
+#    containerd_flavor: "k8s"
+
+- hosts: "master, workers"
+  become_method: sudo
+  become: yes
+  gather_facts: yes
+  tasks:
+    - name: Install Kubernetes binaries
+      apt:
+        name: "{{ packages }}"
+        state: present
+        update_cache: yes
+      vars:
+        packages:
+          - kubelet
+          - kubeadm
+          - kubectl
