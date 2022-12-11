@@ -2,7 +2,7 @@
 - hosts: workers
   become: true
   roles:
-    - ufw-role
+    - ansible-ufw
   vars:
     ufw_rules:
       - rule: allow
@@ -71,7 +71,6 @@
     - name: Join the Worker nodes to the cluster.
       become: yes
       command: sh /tmp/kubernetes_join_command
-      register: joined_or_not
 
     - name: Restart Cri-o
       systemd:
