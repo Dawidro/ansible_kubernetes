@@ -2,97 +2,92 @@
 - hosts: master
   become: true
   roles:
-    - ufw-role
   vars:
     ufw_rules:
       - rule: allow
+        comment: 'allow incoming connection on 22 TCP'
         to_port: 22
         protocol: tcp
-        comment: 'allow incoming connection on 22'
       - rule: allow
+        comment: 'allow incoming connection on 80 TCP'
         to_port: 80
         protocol: tcp
-        comment: 'allow incoming connection on 80'
       - rule: allow
+        comment: 'allow incoming connection on 179 TCP'
         to_port: 179
         protocol: tcp
-        comment: 'allow incoming connection on 179'
       - rule: allow
+        comment: 'allow incoming connection on 443 TCP'
         to_port: 443
         protocol: tcp
-        comment: 'allow incoming connection on 443'
       - rule: allow
+        comment: 'allow incoming connection on 2379 TCP'
         to_port: 2379
         protocol: tcp
-        comment: 'allow incoming connection on 2379'
       - rule: allow
+        comment: 'allow incoming connection on 2380 TCP'
         to_port: 2380
         protocol: tcp
-        comment: 'allow incoming connection on 2380'
       - rule: allow
+        comment: 'allow incoming connection on 4149 TCP'
         to_port: 4149
         protocol: tcp
-        comment: 'allow incoming connection on 4149'
       - rule: allow
+        comment: 'allow incoming connection on 4789 UDP'
         to_port: 4789
         protocol: udp
-        comment: 'allow incoming connection on 4789'
       - rule: allow
+        comment: 'allow incoming connection on 5473 TCP'
         to_port: 5473
         protocol: tcp
-        comment: 'allow incoming connection on 5473'
       - rule: allow
+        comment: 'allow incoming connection on 6443 TCP'
         to_port: 6443
         protocol: tcp
-        comment: 'allow incoming connection on 6443'
       - rule: allow
+        comment: 'allow incoming connection on 7443 TCP'
         to_port: 7443
         protocol: tcp
-        comment: 'allow incoming connection on 7443'
       - rule: allow
+        comment: 'allow incoming connection on 7946 TCP'
         to_port: 7946
         protocol: tcp
-        comment: 'allow incoming connection on 7946'
       - rule: allow
+        comment: 'allow incoming connection on 7946 UDP'
         to_port: 7946
         protocol: udp
-        comment: 'allow incoming connection on 7946'
       - rule: allow
+        comment: 'allow incoming connection on 8080 TCP'
         to_port: 8080
         protocol: tcp
-        comment: 'allow incoming connection on 8080'
       - rule: allow
+        comment: 'allow incoming connection on 8443 TCP'
         to_port: 8443
         protocol: tcp
-        comment: 'allow incoming connection on 8443'
       - rule: allow
+        comment: 'allow incoming connection on 9099 TCP'
         to_port: 9099
         protocol: tcp
-        comment: 'allow incoming connection on 9099'
       - rule: allow
+        comment: 'allow incoming connection on 10250 TCP'
         to_port: 10250
         protocol: tcp
-        comment: 'allow incoming connection on 10250'
       - rule: allow
+        comment: 'allow incoming connection on 10251 TCP'
         to_port: 10251
         protocol: tcp
-        comment: 'allow incoming connection on 10251'
       - rule: allow
+        comment: 'allow incoming connection on 10252 TCP'
         to_port: 10252
         protocol: tcp
-        comment: 'allow incoming connection on 10252'
       - rule: allow
+        comment: 'allow incoming connection on 10255 TCP'
         to_port: 10255
         protocol: tcp
-        comment: 'allow incoming connection on 10255'
       - rule: allow
+        comment: 'allow incoming connection on 10256 TCP'
         to_port: 10256
         protocol: tcp
-        comment: 'allow incoming connection on 10256'
-      - rule: allow
-        to_port: 36001:36020
-        protocol: tcp
-        comment: 'allow incoming connection on ports 36001-36020'
 
 - hosts: "master"
   become_method: sudo

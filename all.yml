@@ -80,13 +80,7 @@
   become_method: sudo
   roles:
     - update_debian
-#    - ufw-role
-#    - ansible-role-containerd
     - ansible-role-cri_o
-#  vars:
-#    containerd_flavor: "k8s"
-#  vars:
-#    containerd_config_cgroup_driver_systemd: true
 
 - hosts: "workers"
   become: yes
@@ -94,10 +88,7 @@
   roles:
     - update_debian
     - ufw-role
-#    - ansible-role-containerd
     - ansible-role-cri_o
-#  vars:
-#    containerd_flavor: "k8s"
 
 - hosts: "master, workers"
   become_method: sudo

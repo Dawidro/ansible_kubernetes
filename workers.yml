@@ -1,5 +1,53 @@
 ---
 - hosts: workers
+  become: true
+  roles:
+    - ufw-role
+  vars:
+    ufw_rules:
+      - rule: allow
+        comment: 'allow incoming connection on 22 TCP'
+        to_port: 22
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 179 TCP'
+        to_port: 179
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 443 TCP'
+        to_port: 443
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 7946 TCP'
+        to_port: 7946
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 7946 UDP'
+        to_port: 7946
+        protocol: udp
+      - rule: allow
+        comment: 'allow incoming connection on 8443 TCP'
+        to_port: 8443
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10250 TCP'
+        to_port: 10250
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10251 TCP'
+        to_port: 10251
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10255 TCP'
+        to_port: 10255
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on range 30000:32767 TCP'
+        to_port: 30000:32767
+        protocol: tcp
+
+
+- hosts: workers
   become: yes
   gather_facts: yes
 
@@ -24,16 +72,6 @@
       become: yes
       command: sh /tmp/kubernetes_join_command
       register: joined_or_not
-
-    - name: Install NFS
-      apt:
-        name: "{{ packages }}"
-        state: present
-        update_cache: yes
-      vars:
-        packages:
-        - nfs-common
-
 
     - name: Restart Cri-o
       systemd:
