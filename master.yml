@@ -148,7 +148,7 @@
     - name: Create manifest to install Calico
       become: yes
       become_user: vmadmin
-      command: kubectl create -f /home/vmadmin/ansible_kubernetes/custom-resources.yml
+      command: kubectl create -f /home/vmadmin/ansible_kubernetes/custom-resources.yaml
 
     - name: Get the token for joining the worker nodes
       become: yes
