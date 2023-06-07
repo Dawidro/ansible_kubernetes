@@ -15,16 +15,24 @@
 
     - name: Set system configurations for Kubernetes networking
       file:
-        path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+        path: "/etc/sysctl.d/99-k8s-cri.conf"
         state: "touch"
 
-    - name: Add conf for containerd
+    - name: Add conf for CRI-O
       blockinfile:
-        path: "/etc/sysctl.d/99-kubernetes-cri.conf"
+        path: "/etc/sysctl.d/99-k8s-cri.conf"
         block: |
                net.bridge.bridge-nf-call-iptables = 1
                net.ipv4.ip_forward = 1
                net.bridge.bridge-nf-call-ip6tables = 1
+
+    - name: Update apt repo and cache on all Debian/Ubuntu boxes
+      apt:
+        update_cache: yes
+        force_apt_get: yes
+        cache_valid_time: 3600
+
+
 
     - name: Install packages that allow apt to be used over HTTPS
       apt:
@@ -40,24 +48,17 @@
         - software-properties-common
         - fuse-overlayfs
 
-    - name: add Kubernates apt-key
-      apt_key:
-        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-        state: present
+#    - name: add Kubernates apt-key
+#      apt_key:
+#        url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+#        state: present
 
-    - name: add Kubernates repository apt repository
-      apt_repository:
-        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
-        state: present
-        filename: kubernates
-        update_cache: yes
-
-    - name: Update apt repo and cache on all Debian/Ubuntu boxes
-      apt:
-        update_cache: yes
-        force_apt_get: yes
-        cache_valid_time: 3600
-
+#    - name: add Kubernates repository apt repository
+#      apt_repository:
+#        repo: deb https://apt.kubernetes.io/ kubernetes-xenial main
+#        state: present
+#        filename: kubernates
+#        update_cache: yes
 
     - name: Apply new settings
       command: sudo sysctl --system
@@ -87,7 +88,7 @@
   become_method: sudo
   roles:
     - update_debian
-    - ansible-ufw
+#    - ansible-ufw
     - ansible-role-cri_o
 
 - hosts: "master, workers"

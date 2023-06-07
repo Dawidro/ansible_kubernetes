@@ -128,11 +128,11 @@
 
     - name: Download custom-resources.yaml
       get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/custom-resources.yaml
+        url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
         dest: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
         mode: 0755
 
-    - name: Replace string with sed
+    - name: Replace string for 172.16.x.x network
       become: yes
       become_user: vmadmin
       replace:
@@ -143,7 +143,7 @@
     - name: Install tigera operator
       become: yes
       become_user: vmadmin
-      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/tigera-operator.yaml
+      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
 
     - name: Create manifest to install Calico
       become: yes
