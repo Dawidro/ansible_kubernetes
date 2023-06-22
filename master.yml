@@ -95,8 +95,8 @@
   become: yes
   gather_facts: yes
   tasks:
-    - name: Initialize the Kubernetes cluster using kubeadm
-      command: kubeadm init --apiserver-advertise-address="192.168.122.101"  --node-name master --pod-network-cidr=172.16.0.0/12
+    - name: Initialize Kubernetes cluster using kubeadm
+      command: kubeadm init --apiserver-advertise-address="192.168.122.101"  --node-name master --pod-network-cidr=172.16.0.0/16
 
     - name: create .kube directory
       become: yes
