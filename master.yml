@@ -120,41 +120,40 @@
         owner: vmadmin
         group: vmadmin
 
-    - name: Restart kubelet
-      service:
-        name: kubelet
-        daemon_reload: yes
-        state: restarted
+#    - name: Restart kubelet
+#      service:
+#        name: kubelet
+#        daemon_reload: yes
+#        state: restarted
 
-    - name: Download custom-resources.yaml
+    - name: Download custom-resources.yaml Calico
       get_url:
         url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
         dest: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
         mode: 0755
 
     - name: Replace string for 172.16.x.x network
-      become: yes
-      become_user: vmadmin
       replace:
         path: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
         regexp: '192.168.0.0'
         replace: '172.16.0.0'
 
     - name: Install tigera operator
-      become: yes
-      become_user: vmadmin
       command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
 
     - name: Create manifest to install Calico
-      become: yes
       become_user: vmadmin
       command: kubectl create -f /home/vmadmin/ansible_kubernetes/custom-resources.yaml
 
     - name: Get the token for joining the worker nodes
-      become: yes
       shell: kubeadm token create  --print-join-command
       register: kubernetes_join_command
 
     - name: Copy join command to local file.
-      become: yes
       local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
+
+    - name: Restart kubelet
+      service:
+        name: kubelet
+        daemon_reload: yes
+        state: restarted
