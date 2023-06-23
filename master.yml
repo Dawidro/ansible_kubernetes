@@ -2,7 +2,7 @@
 - hosts: master
   become: true
   roles:
-    - ufw-role
+    - ansible-ufw
   vars:
     ufw_rules:
       - rule: allow
