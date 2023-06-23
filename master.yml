@@ -2,100 +2,104 @@
 - hosts: master
   become: true
   roles:
-    - ansible-ufw
+    - ufw-role
   vars:
     ufw_rules:
       - rule: allow
-        comment: 'allow incoming connection on 22 TCP'
         to_port: 22
         protocol: tcp
+        comment: 'allow incoming connection on 22'
       - rule: allow
-        comment: 'allow incoming connection on 80 TCP'
         to_port: 80
         protocol: tcp
+        comment: 'allow incoming connection on 80'
       - rule: allow
-        comment: 'allow incoming connection on 179 TCP'
         to_port: 179
         protocol: tcp
+        comment: 'allow incoming connection on 179'
       - rule: allow
-        comment: 'allow incoming connection on 443 TCP'
         to_port: 443
         protocol: tcp
+        comment: 'allow incoming connection on 443'
       - rule: allow
-        comment: 'allow incoming connection on 2379 TCP'
         to_port: 2379
         protocol: tcp
+        comment: 'allow incoming connection on 2379'
       - rule: allow
-        comment: 'allow incoming connection on 2380 TCP'
         to_port: 2380
         protocol: tcp
+        comment: 'allow incoming connection on 2380'
       - rule: allow
-        comment: 'allow incoming connection on 4149 TCP'
         to_port: 4149
         protocol: tcp
+        comment: 'allow incoming connection on 4149'
       - rule: allow
-        comment: 'allow incoming connection on 4789 UDP'
         to_port: 4789
         protocol: udp
+        comment: 'allow incoming connection on 4789'
       - rule: allow
-        comment: 'allow incoming connection on 5473 TCP'
         to_port: 5473
         protocol: tcp
+        comment: 'allow incoming connection on 5473'
       - rule: allow
-        comment: 'allow incoming connection on 6443 TCP'
         to_port: 6443
         protocol: tcp
+        comment: 'allow incoming connection on 6443'
       - rule: allow
-        comment: 'allow incoming connection on 7443 TCP'
         to_port: 7443
         protocol: tcp
+        comment: 'allow incoming connection on 7443'
       - rule: allow
-        comment: 'allow incoming connection on 7946 TCP'
         to_port: 7946
         protocol: tcp
+        comment: 'allow incoming connection on 7946'
       - rule: allow
-        comment: 'allow incoming connection on 7946 UDP'
         to_port: 7946
         protocol: udp
+        comment: 'allow incoming connection on 7946'
       - rule: allow
-        comment: 'allow incoming connection on 8080 TCP'
         to_port: 8080
         protocol: tcp
+        comment: 'allow incoming connection on 8080'
       - rule: allow
-        comment: 'allow incoming connection on 8443 TCP'
         to_port: 8443
         protocol: tcp
+        comment: 'allow incoming connection on 8443'
       - rule: allow
-        comment: 'allow incoming connection on 9099 TCP'
         to_port: 9099
         protocol: tcp
+        comment: 'allow incoming connection on 9099'
       - rule: allow
-        comment: 'allow incoming connection on 10250 TCP'
         to_port: 10250
         protocol: tcp
+        comment: 'allow incoming connection on 10250'
       - rule: allow
-        comment: 'allow incoming connection on 10251 TCP'
         to_port: 10251
         protocol: tcp
+        comment: 'allow incoming connection on 10251'
       - rule: allow
-        comment: 'allow incoming connection on 10252 TCP'
         to_port: 10252
         protocol: tcp
+        comment: 'allow incoming connection on 10252'
       - rule: allow
-        comment: 'allow incoming connection on 10255 TCP'
         to_port: 10255
         protocol: tcp
+        comment: 'allow incoming connection on 10255'
       - rule: allow
-        comment: 'allow incoming connection on 10256 TCP'
         to_port: 10256
         protocol: tcp
+        comment: 'allow incoming connection on 10256'
+      - rule: allow
+        to_port: 36001:36020
+        protocol: tcp
+        comment: 'allow incoming connection on ports 36001-36020'
 
 - hosts: "master"
   become_method: sudo
   become: yes
   gather_facts: yes
   tasks:
-    - name: Initialize Kubernetes cluster using kubeadm
+    - name: Initialize the Kubernetes cluster using kubeadm
       command: kubeadm init --apiserver-advertise-address="192.168.122.101"  --node-name master --pod-network-cidr=172.16.0.0/16
 
     - name: create .kube directory
@@ -126,26 +130,26 @@
         daemon_reload: yes
         state: restarted
 
-    - name: Download custom-resources.yaml Calico
+    - name: Download custom-resources.yaml
       get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
-        dest: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
+        url: https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/custom-resources.yaml
+        dest: /home/vmadmin/custom-resources.yaml
         mode: 0755
 
-    - name: Replace string for 172.16.x.x network
-      replace:
-        path: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
-        regexp: '192.168.0.0'
-        replace: '172.16.0.0'
+    - name: Replace string with sed
+      become: yes
+      become_user: vmadmin
+      shell: sed 's/192.168.0.0/172.16.0.0/' custom-resources.yaml > custom-resources.yml
 
     - name: Install tigera operator
       become: yes
-      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
+      become_user: vmadmin
+      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/tigera-operator.yaml
 
     - name: Create manifest to install Calico
       become: yes
       become_user: vmadmin
-      command: kubectl create -f /home/vmadmin/ansible_kubernetes/custom-resources.yaml
+      command: kubectl create -f /home/vmadmin/custom-resources.yml
 
     - name: Get the token for joining the worker nodes
       become: yes
@@ -155,16 +159,3 @@
     - name: Copy join command to local file.
       become: yes
       local_action: copy content="{{ kubernetes_join_command.stdout_lines[0] }}" dest="/tmp/kubernetes_join_command" mode=0777
-
-    - name: Restart Cri-o
-      systemd:
-        name: crio
-        daemon_reload: yes
-        state: restarted
-
-
-    - name: Restart kubelet
-      service:
-        name: kubelet
-        daemon_reload: yes
-        state: restarted
