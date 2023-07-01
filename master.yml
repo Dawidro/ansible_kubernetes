@@ -176,8 +176,7 @@
     - name: Restart calico-kube-controllers
       command: kubectl rollout restart -n calico-system deployments/calico-kube-controllers
 
-    - name: Restart kubelet
+    - name: Start kubelet
       service:
         name: kubelet
-        daemon_reload: yes
-        state: restarted
+        state: started
