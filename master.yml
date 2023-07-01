@@ -133,7 +133,7 @@
     - name: Download custom-resources.yaml for Calico CNI
       get_url:
         url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
-        dest: /home/vmadmin/custom-resources.yaml
+        dest: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
         mode: 0755
 
     - name: Replace string for 172.16.x.x network
