@@ -102,14 +102,14 @@
     - name: Initialize the Kubernetes cluster using kubeadm
       command: kubeadm init --apiserver-advertise-address="192.168.122.101"  --node-name master --pod-network-cidr=172.16.0.0/16
 
-    - name: create .kube directory
+    - name: Create .kube directory
       become: yes
       file:
         path: /home/vmadmin/.kube
         state: directory
         mode: 0755
 
-    - name: copies admin.conf to user's kube config
+    - name: Copy admin.conf to user's kube config
       copy:
         src: /etc/kubernetes/admin.conf
         dest: /home/vmadmin/.kube/config
@@ -130,21 +130,22 @@
         daemon_reload: yes
         state: restarted
 
-    - name: Download custom-resources.yaml
+    - name: Download custom-resources.yaml for Calico CNI
       get_url:
-        url: https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/custom-resources.yaml
+        url: https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/custom-resources.yaml
         dest: /home/vmadmin/custom-resources.yaml
         mode: 0755
 
-    - name: Replace string with sed
-      become: yes
-      become_user: vmadmin
-      shell: sed 's/192.168.0.0/172.16.0.0/' custom-resources.yaml > custom-resources.yml
+    - name: Replace string for 172.16.x.x network
+      replace:
+        path: /home/vmadmin/ansible_kubernetes/custom-resources.yaml
+        regexp: '192.168.0.0'
+        replace: '172.16.0.0'
 
-    - name: Install tigera operator
+    - name: Install Tigera operator
       become: yes
       become_user: vmadmin
-      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.24.1/manifests/tigera-operator.yaml
+      command: kubectl create -f https://raw.githubusercontent.com/projectcalico/calico/v3.26.0/manifests/tigera-operator.yaml
 
     - name: Create manifest to install Calico
       become: yes
