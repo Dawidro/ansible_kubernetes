@@ -72,12 +72,6 @@
       become: yes
       command: sh /tmp/kubernetes_join_command
 
-    - name: Restart Cri-o
-      systemd:
-        state: restarted
-        daemon_reload: yes
-        name: crio
-
     - name: Restart kubelet
       service:
         name: kubelet
