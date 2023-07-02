@@ -89,10 +89,6 @@
         to_port: 10256
         protocol: tcp
         comment: 'allow incoming connection on 10256'
-      - rule: allow
-        to_port: 36001:36020
-        protocol: tcp
-        comment: 'allow incoming connection on ports 36001-36020'
 
 - hosts: "master"
   become_method: sudo
@@ -166,15 +162,6 @@
         name: crio
         daemon_reload: yes
         state: restarted
-
-    - name: Restart CoreDNS
-      command: kubectl rollout restart -n kube-system deployment/coredns
-
-    - name: Restart calico-kube-controllers daemonset
-      command: kubectl rollout restart -n calico-system daemonset calico-kube-controllers
-
-    - name: Restart calico-kube-controllers
-      command: kubectl rollout restart -n calico-system deployments/calico-kube-controllers
 
     - name: Restart kubelet
       service:
