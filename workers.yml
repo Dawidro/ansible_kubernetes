@@ -18,6 +18,10 @@
         to_port: 443
         protocol: tcp
       - rule: allow
+        comment: 'allow incoming connection on 6443 TCP'
+        to_port: 6443
+        protocol: tcp
+      - rule: allow
         comment: 'allow incoming connection on 7946 TCP'
         to_port: 7946
         protocol: tcp
@@ -30,6 +34,10 @@
         to_port: 8443
         protocol: tcp
       - rule: allow
+        comment: 'allow incoming connection on 10249 TCP'
+        to_port: 10249
+        protocol: tcp
+      - rule: allow
         comment: 'allow incoming connection on 10250 TCP'
         to_port: 10250
         protocol: tcp
@@ -38,8 +46,32 @@
         to_port: 10251
         protocol: tcp
       - rule: allow
+        comment: 'allow incoming connection on 10252 TCP'
+        to_port: 10252
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10253 TCP'
+        to_port: 10253
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10254 TCP'
+        to_port: 10254
+        protocol: tcp
+      - rule: allow
         comment: 'allow incoming connection on 10255 TCP'
         to_port: 10255
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10256 TCP'
+        to_port: 10256
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10257 TCP'
+        to_port: 10257
+        protocol: tcp
+      - rule: allow
+        comment: 'allow incoming connection on 10259 TCP'
+        to_port: 10259
         protocol: tcp
       - rule: allow
         comment: 'allow incoming connection on range 30000:32767 TCP'
